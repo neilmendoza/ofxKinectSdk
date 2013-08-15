@@ -106,6 +106,14 @@ namespace itg
 			NuiImageResolutionToSize(depthResolution, w, h);
 			depthW = w;
 			depthH = h;
+
+			depthPixelsRaw.allocate(depthW, depthH, 1);
+			depthPixels.allocate(depthW, depthH, 1);
+
+			depthPixelsRaw.set(0);
+			depthPixels.set(0);
+
+			depthTex.allocate(depthW, depthH, GL_LUMINANCE);
 		}
 
 		if (NULL == sensor || FAILED(hr))
@@ -164,7 +172,8 @@ namespace itg
 			if( lockedRect.Pitch != 0 )
 			{
 				depthPixelsRaw.setFromPixels((unsigned short*)lockedRect.pBits, depthW, depthH, 1);
-				//memcpy(depthBufferRaw, lockedRect.pBits, pTexture->BufferLen());
+				//memcpy((unsigned char *)depthPixelsRaw.getPixels(), lockedRect.pBits, depthW * depthH * DEPTH_BYTES_PER_PIXEL);
+				//memcpy(depthBufferRawChars, lockedRect.pBits, depthW * depthH * DEPTH_BYTES_PER_PIXEL);
 			}
 			pTexture->UnlockRect( 0 );
 
@@ -345,7 +354,9 @@ namespace itg
 		int n = depthW * depthH;
 		for(int i = 0; i < n; i++)
 		{
-			depthPixels[i] = depthLookupTable[depthPixelsRaw[i]];
+			short raw = depthPixelsRaw[i];
+			if (raw > depthLookupTable.size() - 1) depthPixels[i] = depthLookupTable.back();
+			else depthPixels[i] = depthLookupTable[raw];
 		}
 	}
 }
