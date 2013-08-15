@@ -1,5 +1,5 @@
 /*
- *  Kinect.cpp
+ *  KinectSdk.cpp
  *
  *  Copyright (c) 2012, Neil Mendoza, http://www.neilmendoza.com
  *  All rights reserved. 
@@ -29,20 +29,23 @@
  *  POSSIBILITY OF SUCH DAMAGE. 
  *
  */
-#include "Kinect.h"
+#include "KinectSdk.h"
 
 namespace itg
 {
-	ofVec3f toOf(const Vector4& ms)
+	const float KinectSdk::UNIT_SCALARS[NUM_UNITS] = {1.f, 100.f, 1000.f};
+
+	ofVec3f KinectSdk::toOf(const Vector4& ms)
 	{
 		return ofVec3f(ms.x, ms.y, ms.z);
 	}
 
-	Kinect::Kinect() : frameNew(false)
+	KinectSdk::KinectSdk() : frameNew(false)
 	{
+		setUnit(M);
 	}
 
-	bool Kinect::init(bool useSkeleton, bool useDepth)
+	bool KinectSdk::init(bool useSkeleton, bool useDepth)
 	{
 		resolution = RESOLUTION_320_240;
 
@@ -52,7 +55,7 @@ namespace itg
 		HRESULT hr = NuiGetSensorCount(&iSensorCount);
 		if (FAILED(hr)) return false;
 
-		// Look at each Kinect sensor
+		// Look at each KinectSdk sensor
 		for (int i = 0; i < iSensorCount; ++i)
 		{
 			// Create the sensor so we can check status, if we can't create it, move on to the next
@@ -76,7 +79,7 @@ namespace itg
 
 		if (NULL != sensor)
 		{
-			// Initialize the Kinect and specify that we'll be using skeleton
+			// Initialize the KinectSdk and specify that we'll be using skeleton
 			hr = sensor->NuiInitialize(NUI_INITIALIZE_FLAG_USES_SKELETON | NUI_INITIALIZE_FLAG_USES_DEPTH); 
 			if (SUCCEEDED(hr) && useSkeleton)
 			{
@@ -101,21 +104,27 @@ namespace itg
 
 		if (NULL == sensor || FAILED(hr))
 		{
-			ofLogError() << "No ready Kinect found!";
+			ofLogError() << "No ready KinectSdk found!";
 			return E_FAIL;
 		}
 
 		return hr;
 	}
 
-	bool Kinect::isFrameNew()
+	void KinectSdk::setUnit(Unit unit)
+	{
+		unitScalar = UNIT_SCALARS[unit];
+		this->unit = unit;
+	}
+
+	bool KinectSdk::isFrameNew()
 	{
 		bool temp = frameNew;
 		frameNew = false;
 		return temp;
 	}
 
-    void Kinect::update()
+    void KinectSdk::update()
 	{
 		if (!sensor) return;
 
@@ -155,25 +164,38 @@ namespace itg
 		}
 	}
 
-	void Kinect::depthToMat(cv::Mat& mat)
+	void KinectSdk::depthToMat(cv::Mat& mat)
 	{
-
 
 	}
 
-	unsigned Kinect::getNumSkeletons(NUI_SKELETON_TRACKING_STATE trackingState)
-	{
-		unsigned skeletons = 0;
 
+	NUI_SKELETON_POSITION_TRACKING_STATE KinectSdk::getSkeletonPosition(ofVec3f& position, unsigned skeletonIdx, NUI_SKELETON_POSITION_INDEX joint)
+	{
+		NUI_SKELETON_POSITION_TRACKING_STATE jointState = skeletonFrame.SkeletonData[skeletonIdx].eSkeletonPositionTrackingState[joint];
+
+		if (jointState != NUI_SKELETON_POSITION_NOT_TRACKED)
+			position = unitScalar * toOf(skeletonFrame.SkeletonData[skeletonIdx].SkeletonPositions[joint]);
+
+		return jointState;
+	}
+
+	vector<unsigned> KinectSdk::getSkeletonIndices(NUI_SKELETON_TRACKING_STATE trackingState)
+	{
+		vector<unsigned> indices;
 		for (int i = 0 ; i < NUI_SKELETON_COUNT; ++i)
 		{
-			if (trackingState == skeletonFrame.SkeletonData[i].eTrackingState) ++skeletons;
+			if (trackingState == skeletonFrame.SkeletonData[i].eTrackingState) indices.push_back(i);
 		}
-
-		return skeletons;
+		return indices;
 	}
 
-	void Kinect::drawSkeletons(bool screenSpace)
+	unsigned KinectSdk::getNumSkeletons(NUI_SKELETON_TRACKING_STATE trackingState)
+	{
+		return getSkeletonIndices().size();
+	}
+
+	void KinectSdk::drawSkeletons(bool screenSpace)
 	{
 		for (int i = 0 ; i < NUI_SKELETON_COUNT; ++i)
 		{
@@ -190,7 +212,7 @@ namespace itg
 		}
 	}
 
-	void Kinect::drawSkeleton(const NUI_SKELETON_DATA& skeletonData, int width, int height, bool screenSpace)
+	void KinectSdk::drawSkeleton(const NUI_SKELETON_DATA& skeletonData, int width, int height, bool screenSpace)
 	{
 		for (int i = 0; i < NUI_SKELETON_POSITION_COUNT; ++i)
 		{
@@ -243,7 +265,7 @@ namespace itg
 		}*/
 	}
 
-	ofVec2f Kinect::skeletonToScreen(Vector4 skeletonPoint, int width, int height)
+	ofVec2f KinectSdk::skeletonToScreen(Vector4 skeletonPoint, int width, int height)
 	{
 		LONG x, y;
 		USHORT depth;
@@ -259,7 +281,7 @@ namespace itg
 	}
 
 	
-	void Kinect::drawBone(const NUI_SKELETON_DATA& skeletonData, NUI_SKELETON_POSITION_INDEX joint0, NUI_SKELETON_POSITION_INDEX joint1, bool screenSpace)
+	void KinectSdk::drawBone(const NUI_SKELETON_DATA& skeletonData, NUI_SKELETON_POSITION_INDEX joint0, NUI_SKELETON_POSITION_INDEX joint1, bool screenSpace)
 	{
 		NUI_SKELETON_POSITION_TRACKING_STATE joint0State = skeletonData.eSkeletonPositionTrackingState[joint0];
 		NUI_SKELETON_POSITION_TRACKING_STATE joint1State = skeletonData.eSkeletonPositionTrackingState[joint1];

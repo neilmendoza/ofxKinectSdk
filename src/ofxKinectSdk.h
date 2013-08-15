@@ -1,5 +1,5 @@
 /*
- *  Kinect.h
+ *  ofxKinectSdk.h
  *
  *  Copyright (c) 2012, Neil Mendoza, http://www.neilmendoza.com
  *  All rights reserved. 
@@ -31,50 +31,6 @@
  */
 #pragma once
 
-#include <Windows.h>
-#include <NuiApi.h>
-#include "ofMain.h"
-#include "ofxCv.h"
+#include "KinectSdk.h"
 
-namespace itg
-{
-	ofVec3f toOf(const Vector4& ms);
-
-	class Kinect
-	{
-	public:
-		enum Resolution
-		{
-			RESOLUTION_320_240
-		};
-
-		Kinect();
-
-		bool init(bool useSkeleton = true, bool useDepth = false);
-		void update();
-		void drawSkeletons(bool screenSpace = true);
-		void drawSkeleton(const NUI_SKELETON_DATA& skeletonData, int width, int height, bool screenSpace = true);
-		void drawBone(const NUI_SKELETON_DATA& skeletonData, NUI_SKELETON_POSITION_INDEX joint0, NUI_SKELETON_POSITION_INDEX joint1, bool screenSpace = true);
-		unsigned getNumSkeletons(NUI_SKELETON_TRACKING_STATE trackingState);
-
-		NUI_SKELETON_FRAME& getSkeletonFrameRef() { return skeletonFrame; }
-
-		bool isFrameNew();
-		void depthToMat(cv::Mat& mat);
-
-	private:
-		INuiSensor* sensor;
-		HANDLE nextSkeletonEvent; // HANDLE is void*
-		HANDLE nextDepthFrameEvent; // HANDLE is void*
-		HANDLE depthStreamHandle; // HANDLE is void*
-		NUI_SKELETON_FRAME skeletonFrame;
-		
-		cv::Mat depthMat;
-		ofVec2f screenPoints[NUI_SKELETON_POSITION_COUNT];
-		ofVec2f skeletonToScreen(Vector4 skeletonPoint, int width, int height);
-		Resolution resolution;
-		bool frameNew;
-		bool useSkeleton, useDepth;
-		NUI_IMAGE_FRAME depthFrame;
-	};
-}
+typedef itg::KinectSdk ofxKinectSdk;
