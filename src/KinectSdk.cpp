@@ -40,15 +40,14 @@ namespace itg
 		return ofVec3f(ms.x, ms.y, ms.z);
 	}
 
-	KinectSdk::KinectSdk() : frameNew(false)
+	KinectSdk::KinectSdk() : frameNew(false), depthResolution(NUI_IMAGE_RESOLUTION_640x480), nearWhite(true), depthStreamHandle(INVALID_HANDLE_VALUE)
 	{
 		setUnit(M);
+		setDepthClipping();
 	}
 
 	bool KinectSdk::init(bool useSkeleton, bool useDepth)
 	{
-		resolution = RESOLUTION_320_240;
-
 		INuiSensor* pNuiSensor;
 
 		int iSensorCount = 0;
@@ -92,14 +91,21 @@ namespace itg
 
 			if (SUCCEEDED(hr) && useDepth)
 			{
+				nextDepthFrameEvent = CreateEventW(NULL, TRUE, FALSE, NULL);
+
 				hr = sensor->NuiImageStreamOpen(
-					NUI_IMAGE_TYPE_DEPTH_AND_PLAYER_INDEX,
-					NUI_IMAGE_RESOLUTION_640x480,
+					NUI_IMAGE_TYPE_DEPTH,
+					depthResolution,
 					0,
 					2,
 					nextDepthFrameEvent,
 					&depthStreamHandle);
 			}
+			
+			DWORD w, h;
+			NuiImageResolutionToSize(depthResolution, w, h);
+			depthW = w;
+			depthH = h;
 		}
 
 		if (NULL == sensor || FAILED(hr))
@@ -155,19 +161,27 @@ namespace itg
 			NUI_LOCKED_RECT lockedRect;
 
 			pTexture->LockRect(0, &lockedRect, NULL, 0);
-			depthMat.data = lockedRect.pBits;
+			if( lockedRect.Pitch != 0 )
+			{
+				depthPixelsRaw.setFromPixels((unsigned short*)lockedRect.pBits, depthW, depthH, 1);
+				//memcpy(depthBufferRaw, lockedRect.pBits, pTexture->BufferLen());
+			}
 			pTexture->UnlockRect( 0 );
 
 			sensor->NuiImageStreamReleaseFrame( depthStreamHandle, &depthFrame );
+
+			updateDepthPixels();
+			depthTex.loadData(depthPixels.getPixels(), depthW, depthH, GL_LUMINANCE);
 
 			frameNew = true;
 		}
 	}
 
+	/*
 	void KinectSdk::depthToMat(cv::Mat& mat)
 	{
 
-	}
+	}*/
 
 
 	NUI_SKELETON_POSITION_TRACKING_STATE KinectSdk::getSkeletonPosition(ofVec3f& position, unsigned skeletonIdx, NUI_SKELETON_POSITION_INDEX joint)
@@ -305,5 +319,33 @@ namespace itg
 		if (screenSpace) ofLine(screenPoints[joint0], screenPoints[joint1]);
 		else ofLine(toOf(skeletonData.SkeletonPositions[joint0]), toOf(skeletonData.SkeletonPositions[joint1]));
 		ofPopStyle();
+	}
+
+	void KinectSdk::updateDepthLookupTable()
+	{
+		unsigned char nearColor = nearWhite ? 255 : 0;
+		unsigned char farColor = nearWhite ? 0 : 255;
+		unsigned int maxDepthLevels = 10001;
+		depthLookupTable.resize(maxDepthLevels);
+		depthLookupTable[0] = 0;
+		for(unsigned int i = 1; i < maxDepthLevels; i++) {
+			depthLookupTable[i] = ofMap(i, nearClipping, farClipping, nearColor, farColor, true);
+		}
+	}
+
+	void KinectSdk::setDepthClipping(float nearClip, float farClip)
+	{
+		nearClipping = nearClip;
+		farClipping = farClip;
+		updateDepthLookupTable();
+	}
+
+	void KinectSdk::updateDepthPixels()
+	{
+		int n = depthW * depthH;
+		for(int i = 0; i < n; i++)
+		{
+			depthPixels[i] = depthLookupTable[depthPixelsRaw[i]];
+		}
 	}
 }

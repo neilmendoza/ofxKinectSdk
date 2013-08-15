@@ -43,11 +43,6 @@ namespace itg
 	class KinectSdk
 	{
 	public:
-		enum Resolution
-		{
-			RESOLUTION_320_240
-		};
-
 		enum Unit
 		{
 			M,
@@ -56,6 +51,8 @@ namespace itg
 
 			NUM_UNITS
 		};
+
+		static const unsigned DEPTH_BYTES_PER_PIXEL = 2;
 
 		static const float UNIT_SCALARS[NUM_UNITS];
 		static ofVec3f toOf(const Vector4& ms);
@@ -74,12 +71,23 @@ namespace itg
 		NUI_SKELETON_FRAME& getSkeletonFrameRef() { return skeletonFrame; }
 
 		bool isFrameNew();
-		void depthToMat(cv::Mat& mat);
+		//void depthToMat(cv::Mat& mat);
 
 		Unit getUnit() const { return unit; }
 		void setUnit(Unit unit);
 
+		void setDepthClipping(float nearClip=500, float farClip=4000);
+
+		ofTexture& getDepthTextureRef() { return depthTex; }
+
 	private:
+		void updateDepthPixels();
+		vector<unsigned char> depthLookupTable;
+		void updateDepthLookupTable();
+		float nearClipping, farClipping;
+		bool nearWhite;
+		ofTexture depthTex;
+
 		Unit unit;
 		float unitScalar;
 
@@ -87,14 +95,20 @@ namespace itg
 		HANDLE nextSkeletonEvent; // HANDLE is void*
 		HANDLE nextDepthFrameEvent; // HANDLE is void*
 		HANDLE depthStreamHandle; // HANDLE is void*
+
 		NUI_SKELETON_FRAME skeletonFrame;
 		
-		cv::Mat depthMat;
+		//cv::Mat depthMat;
 		ofVec2f screenPoints[NUI_SKELETON_POSITION_COUNT];
 		ofVec2f skeletonToScreen(Vector4 skeletonPoint, int width, int height);
-		Resolution resolution;
 		bool frameNew;
 		bool useSkeleton, useDepth;
 		NUI_IMAGE_FRAME depthFrame;
+
+		ofPixels depthPixels;
+		ofShortPixels depthPixelsRaw;
+
+		NUI_IMAGE_RESOLUTION depthResolution;
+		unsigned depthW, depthH;
 	};
 }
