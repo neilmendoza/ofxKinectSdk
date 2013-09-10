@@ -109,9 +109,7 @@ namespace itg
 		NUI_IMAGE_FRAME depthFrame;
 
 		ofPixels depthPixels;
-		//ofShortPixels depthPixelsRaw;
 		unsigned char* depthBufferRaw;
-		//unsigned short* depthRaw;
 
 		NUI_IMAGE_RESOLUTION depthResolution;
 		unsigned depthW, depthH;
