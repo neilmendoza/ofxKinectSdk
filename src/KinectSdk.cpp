@@ -107,10 +107,14 @@ namespace itg
 			depthW = w;
 			depthH = h;
 
-			depthPixelsRaw.allocate(depthW, depthH, 1);
+			depthBufferRaw = new unsigned char[depthW * depthH * DEPTH_BYTES_PER_PIXEL];
+			//depthRaw = new unsigned short[depthW * depthH];
+			//depthPixelsRaw.allocate(depthW, depthH, 1);
 			depthPixels.allocate(depthW, depthH, 1);
 
-			depthPixelsRaw.set(0);
+			memset(depthBufferRaw, 0, depthW * depthH * DEPTH_BYTES_PER_PIXEL);
+			//memset(depthRaw, 0, depthW * depthH);
+			//depthPixelsRaw.set(0);
 			depthPixels.set(0);
 
 			depthTex.allocate(depthW, depthH, GL_LUMINANCE);
@@ -171,15 +175,34 @@ namespace itg
 			pTexture->LockRect(0, &lockedRect, NULL, 0);
 			if( lockedRect.Pitch != 0 )
 			{
-				depthPixelsRaw.setFromPixels((unsigned short*)lockedRect.pBits, depthW, depthH, 1);
+				/*
+				for (unsigned i = 0; i < 20; ++i)
+				{
+					cout << lockedRect.pBits[(int)ofRandom(0, depthH * depthW)] << endl;
+				}
+				*/
+
+				//depthPixelsRaw.setFromPixels((unsigned short*)lockedRect.pBits, depthW, depthH, 1);
+
+				
 				//memcpy((unsigned char *)depthPixelsRaw.getPixels(), lockedRect.pBits, depthW * depthH * DEPTH_BYTES_PER_PIXEL);
 				//memcpy(depthBufferRawChars, lockedRect.pBits, depthW * depthH * DEPTH_BYTES_PER_PIXEL);
+				memcpy(depthBufferRaw, lockedRect.pBits, depthW * depthH * DEPTH_BYTES_PER_PIXEL);
 			}
 			pTexture->UnlockRect( 0 );
 
 			sensor->NuiImageStreamReleaseFrame( depthStreamHandle, &depthFrame );
 
 			updateDepthPixels();
+
+			/*
+			cout << "=======================================" << endl << "raw" << endl;
+			for (unsigned i = 0; i < 20; ++i)
+			{
+				//cout << depthPixelsRaw[(int)ofRandom(0, depthH * depthW)] << endl;
+				cout << depthBufferRawChars[(int)ofRandom(0, depthH * depthW * DEPTH_BYTES_PER_PIXEL)] << endl;
+			}*/
+
 			depthTex.loadData(depthPixels.getPixels(), depthW, depthH, GL_LUMINANCE);
 
 			frameNew = true;
@@ -349,14 +372,30 @@ namespace itg
 		updateDepthLookupTable();
 	}
 
+	short KinectSdk::rawDepth(unsigned x, unsigned y)
+	{
+		return rawDepth(depthW * y + x);
+	}
+
+	short KinectSdk::rawDepth(unsigned idx)
+	{
+		unsigned char* d = (unsigned char*)&depthBufferRaw[idx * DEPTH_BYTES_PER_PIXEL];
+		short raw = (short)(d[0] | d[1] << 8);
+		raw = raw >> 3;
+		return raw;
+	}
+
 	void KinectSdk::updateDepthPixels()
 	{
 		int n = depthW * depthH;
 		for(int i = 0; i < n; i++)
 		{
-			short raw = depthPixelsRaw[i];
+			short raw = rawDepth(i);
 			if (raw > depthLookupTable.size() - 1) depthPixels[i] = depthLookupTable.back();
-			else depthPixels[i] = depthLookupTable[raw];
+			else
+			{
+				depthPixels[i] = depthLookupTable[raw];
+			}
 		}
 	}
 }

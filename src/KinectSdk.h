@@ -80,6 +80,9 @@ namespace itg
 
 		ofTexture& getDepthTextureRef() { return depthTex; }
 
+		short rawDepth(unsigned x, unsigned y);
+		short rawDepth(unsigned idx);
+
 	private:
 		void updateDepthPixels();
 		vector<unsigned char> depthLookupTable;
@@ -106,8 +109,9 @@ namespace itg
 		NUI_IMAGE_FRAME depthFrame;
 
 		ofPixels depthPixels;
-		ofShortPixels depthPixelsRaw;
-		//unsigned char* depthBufferRawChars;
+		//ofShortPixels depthPixelsRaw;
+		unsigned char* depthBufferRaw;
+		//unsigned short* depthRaw;
 
 		NUI_IMAGE_RESOLUTION depthResolution;
 		unsigned depthW, depthH;
