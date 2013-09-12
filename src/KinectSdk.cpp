@@ -279,22 +279,6 @@ namespace itg
 		drawBone(skeletonData, NUI_SKELETON_POSITION_HIP_RIGHT, NUI_SKELETON_POSITION_KNEE_RIGHT, screenSpace);
 		drawBone(skeletonData, NUI_SKELETON_POSITION_KNEE_RIGHT, NUI_SKELETON_POSITION_ANKLE_RIGHT, screenSpace);
 		drawBone(skeletonData, NUI_SKELETON_POSITION_ANKLE_RIGHT, NUI_SKELETON_POSITION_FOOT_RIGHT, screenSpace);
-
-		/*
-		// Draw the joints in a different color
-		for (i = 0; i < NUI_SKELETON_POSITION_COUNT; ++i)
-		{
-			D2D1_ELLIPSE ellipse = D2D1::Ellipse( m_Points[i], g_JointThickness, g_JointThickness );
-
-			if ( skel.eSkeletonPositionTrackingState[i] == NUI_SKELETON_POSITION_INFERRED )
-			{
-				m_pRenderTarget->DrawEllipse(ellipse, m_pBrushJointInferred);
-			}
-			else if ( skel.eSkeletonPositionTrackingState[i] == NUI_SKELETON_POSITION_TRACKED )
-			{
-				m_pRenderTarget->DrawEllipse(ellipse, m_pBrushJointTracked);
-			}
-		}*/
 	}
 
 	ofVec2f KinectSdk::skeletonToScreen(Vector4 skeletonPoint, int width, int height)
