@@ -83,6 +83,11 @@ namespace itg
 		short rawDepth(unsigned x, unsigned y);
 		short rawDepth(unsigned idx);
 
+		unsigned getDepthW() const { return depthW; }
+		unsigned getDepthH() const { return depthH; }
+
+		ofVec3f getWorldCoordinateAt(int cx, int cy);
+
 	private:
 		void updateDepthPixels();
 		vector<unsigned char> depthLookupTable;
@@ -108,6 +113,7 @@ namespace itg
 		bool useSkeleton, useDepth;
 		NUI_IMAGE_FRAME depthFrame;
 
+		ofShortPixels depthPixelsRaw;
 		ofPixels depthPixels;
 		unsigned char* depthBufferRaw;
 

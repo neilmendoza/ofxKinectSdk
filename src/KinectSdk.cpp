@@ -108,10 +108,12 @@ namespace itg
 			depthH = h;
 
 			depthBufferRaw = new unsigned char[depthW * depthH * DEPTH_BYTES_PER_PIXEL];
+			depthPixelsRaw.allocate(depthW, depthH, 1);
 			depthPixels.allocate(depthW, depthH, 1);
 
 			memset(depthBufferRaw, 0, depthW * depthH * DEPTH_BYTES_PER_PIXEL);
 			depthPixels.set(0);
+			depthPixelsRaw.set(0);
 
 			depthTex.allocate(depthW, depthH, GL_LUMINANCE);
 		}
@@ -151,8 +153,6 @@ namespace itg
 			// smooth out the skeleton data
 			sensor->NuiTransformSmooth(&skeletonFrame, NULL);
 
-			//sensor->Nuigetd
-
 			frameNew = true;
 		}
 
@@ -191,6 +191,16 @@ namespace itg
 
 	}*/
 
+	ofVec3f KinectSdk::getWorldCoordinateAt(int cx, int cy)
+	{
+		return unitScalar * toOf(NuiTransformDepthImageToSkeleton(
+				cx,
+				cy,
+				depthPixelsRaw[cy * depthW + cx] << 3,
+				depthResolution
+			)
+		);
+	}
 
 	NUI_SKELETON_POSITION_TRACKING_STATE KinectSdk::getSkeletonPosition(ofVec3f& position, unsigned skeletonIdx, NUI_SKELETON_POSITION_INDEX joint)
 	{
@@ -366,8 +376,8 @@ namespace itg
 		int n = depthW * depthH;
 		for(int i = 0; i < n; i++)
 		{
-			short raw = rawDepth(i);
-			depthPixels[i] = depthLookupTable[raw];
+			depthPixelsRaw[i] = rawDepth(i);
+			depthPixels[i] = depthLookupTable[depthPixelsRaw[i]];
 		}
 	}
 }
