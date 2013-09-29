@@ -144,8 +144,19 @@ namespace itg
 	{
 		if (!sensor) return;
 
+		if (skeletonPlayStream.is_open())
+		{
+			string line;
+			if (!getline(skeletonPlayStream, line))
+			{
+				skeletonPlayStream.clear();
+				skeletonPlayStream.seekg(ifstream::beg);
+				if (!getline(skeletonPlayStream, line)) ofLogError() << "Error trying to loop skeleton playback, is file empty?";
+			}
+			if (!line.empty()) parsePlayback(line);
+		}
 		// Wait for 0ms, just quickly test if it is time to process a skeleton
-		if (useSkeleton && WAIT_OBJECT_0 == WaitForSingleObject(nextSkeletonEvent, 0) )
+		else if (useSkeleton && WAIT_OBJECT_0 == WaitForSingleObject(nextSkeletonEvent, 0) )
 		{
 			HRESULT hr = sensor->NuiSkeletonGetNextFrame(0, &skeletonFrame);
 			if ( FAILED(hr) ) return;
@@ -163,17 +174,18 @@ namespace itg
 					// first one
 					for (unsigned i = 0; i < NUI_SKELETON_POSITION_COUNT; ++i)
 					{
+						if (i) skeletonRecordStream << ":";
 						ofVec3f pos;
-						if (getSkeletonPosition(pos, indices[0], (NUI_SKELETON_POSITION_INDEX)i))
+						NUI_SKELETON_POSITION_TRACKING_STATE tracked = getSkeletonPosition(pos, indices[0], (NUI_SKELETON_POSITION_INDEX)i);
+						if (tracked != NUI_SKELETON_POSITION_NOT_TRACKED)
 						{
 							// don't stream pos as ofVec3f stream operator has spaces
-							skeletonRecordStream << pos.x << "," << pos.y << "," << pos.z << ":";
+							skeletonRecordStream << pos.x << "," << pos.y << "," << pos.z;
 						}
 					}
 					skeletonRecordStream << endl;
 				}
 			}
-
 			frameNew = true;
 		}
 
@@ -206,11 +218,46 @@ namespace itg
 		}
 	}
 
-	void KinectSdk::record(const string& fileName)
+	void KinectSdk::recordStart(const string& fileName)
 	{
+		if (skeletonPlayStream.is_open()) skeletonPlayStream.close();
 		string path = ofToDataPath(fileName);
 		ofLogNotice() << "Recording skeleton data to " << path;
 		skeletonRecordStream.open(path);
+	}
+
+	void KinectSdk::recordStop()
+	{
+		skeletonRecordStream.close();
+	}
+
+	void KinectSdk::parsePlayback(const string& line)
+	{
+		vector<string> split = ofSplitString(line, ":");
+		for (unsigned i = 0; i < split.size(); ++i)
+		{
+			if (split[i].empty()) recordedTracked[i] = false;
+			else
+			{
+				recordedTracked[i] = true;
+				vector<string> xyz = ofSplitString(split[i], ",");
+				recordedPositions[i].set(atof(xyz[0].c_str()), atof(xyz[1].c_str()), atof(xyz[2].c_str()));
+			}
+		}
+	}
+
+	void KinectSdk::playStart(const string& fileName)
+	{
+		for (unsigned i = 0; i < NUI_SKELETON_POSITION_COUNT; ++i) recordedTracked[i] = false;
+		if (skeletonRecordStream.is_open()) skeletonRecordStream.close();
+		string path = ofToDataPath(fileName);
+		ofLogNotice() << "Playing skeleton data from " << path;
+		skeletonPlayStream.open(path);
+	}
+
+	void KinectSdk::playStop()
+	{
+
 	}
 
 	/*

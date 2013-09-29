@@ -85,10 +85,23 @@ namespace itg
 
 		ofVec3f getWorldCoordinateAt(int cx, int cy);
 
-		void record(const string& fileName);
+		// simple skeleton record and playback implementation
+		// TODO: record depth and add timestamps rather than
+		// just reading a line per frame
+		void recordStart(const string& fileName);
+		void recordStop();
+
+		void playStart(const string& fileName);
+		void playStop();
 
 	private:
+		void parsePlayback(const string& line);
+		
+		ofVec3f recordedPositions[NUI_SKELETON_POSITION_COUNT];
+		bool recordedTracked[NUI_SKELETON_POSITION_COUNT];
+
 		ofstream skeletonRecordStream;
+		ifstream skeletonPlayStream;
 
 		void updateDepthPixels();
 		vector<unsigned char> depthLookupTable;
