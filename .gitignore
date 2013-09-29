@@ -6,4 +6,5 @@
 */*/*.pdb
 */*.sdf
 */*.opensdf
+*/*.suo
 */obj

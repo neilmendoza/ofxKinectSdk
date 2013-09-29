@@ -85,7 +85,11 @@ namespace itg
 
 		ofVec3f getWorldCoordinateAt(int cx, int cy);
 
+		void record(const string& fileName);
+
 	private:
+		ofstream skeletonRecordStream;
+
 		void updateDepthPixels();
 		vector<unsigned char> depthLookupTable;
 		void updateDepthLookupTable();

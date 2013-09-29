@@ -153,6 +153,27 @@ namespace itg
 			// smooth out the skeleton data
 			sensor->NuiTransformSmooth(&skeletonFrame, NULL);
 
+			if (skeletonRecordStream.is_open())
+			{
+				vector<unsigned> indices = getSkeletonIndices();
+				if (!indices.empty())
+				{
+					// HACK
+					// TODO: record multiple skeletons, for now just record the
+					// first one
+					for (unsigned i = 0; i < NUI_SKELETON_POSITION_COUNT; ++i)
+					{
+						ofVec3f pos;
+						if (getSkeletonPosition(pos, indices[0], (NUI_SKELETON_POSITION_INDEX)i))
+						{
+							// don't stream pos as ofVec3f stream operator has spaces
+							skeletonRecordStream << pos.x << "," << pos.y << "," << pos.z << ":";
+						}
+					}
+					skeletonRecordStream << endl;
+				}
+			}
+
 			frameNew = true;
 		}
 
@@ -183,6 +204,13 @@ namespace itg
 
 			frameNew = true;
 		}
+	}
+
+	void KinectSdk::record(const string& fileName)
+	{
+		string path = ofToDataPath(fileName);
+		ofLogNotice() << "Recording skeleton data to " << path;
+		skeletonRecordStream.open(path);
 	}
 
 	/*
