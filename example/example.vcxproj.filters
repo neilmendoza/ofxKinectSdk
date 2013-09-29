@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	<ItemGroup>
+		<ClCompile Include="src\testApp.cpp">
+			<Filter>src</Filter>
+		</ClCompile>
+		<ClCompile Include="src\main.cpp">
+			<Filter>src</Filter>
+		</ClCompile>
+		<ClCompile Include="..\..\..\addons\ofxKinectSdk\src\KinectSdk.cpp">
+			<Filter>addons\ofxKinectSdk\src</Filter>
+		</ClCompile>
+	</ItemGroup>
+	<ItemGroup>
+		<Filter Include="src">
+			<UniqueIdentifier>{d8376475-7454-4a24-b08a-aac121d3ad6f}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="addons">
+			<UniqueIdentifier>{71834F65-F3A9-211E-73B8-DC85}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="addons\ofxKinectSdk">
+			<UniqueIdentifier>{0A686209-5827-099F-A7F6-01DB}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="addons\ofxKinectSdk\src">
+			<UniqueIdentifier>{1FE9A0E0-B0FA-CD2A-0B7A-A695}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="addons\ofxKinectSdk\libs">
+			<UniqueIdentifier>{C265168E-80F5-81A7-4973-DF16}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="addons\ofxKinectSdk\libs\kinect">
+			<UniqueIdentifier>{786A09DB-4C46-30DE-2F50-3D08}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="addons\ofxKinectSdk\libs\kinect\include">
+			<UniqueIdentifier>{9DE9CD6A-8A63-A6A0-2F51-5BA8}</UniqueIdentifier>
+		</Filter>
+	</ItemGroup>
+	<ItemGroup>
+		<ClInclude Include="src\testApp.h">
+			<Filter>src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\addons\ofxKinectSdk\src\KinectSdk.h">
+			<Filter>addons\ofxKinectSdk\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\addons\ofxKinectSdk\src\ofxKinectSdk.h">
+			<Filter>addons\ofxKinectSdk\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\addons\ofxKinectSdk\libs\kinect\include\NuiApi.h">
+			<Filter>addons\ofxKinectSdk\libs\kinect\include</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\addons\ofxKinectSdk\libs\kinect\include\NuiImageCamera.h">
+			<Filter>addons\ofxKinectSdk\libs\kinect\include</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\addons\ofxKinectSdk\libs\kinect\include\NuiSensor.h">
+			<Filter>addons\ofxKinectSdk\libs\kinect\include</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\addons\ofxKinectSdk\libs\kinect\include\NuiSkeleton.h">
+			<Filter>addons\ofxKinectSdk\libs\kinect\include</Filter>
+		</ClInclude>
+	</ItemGroup>
+	<ItemGroup>
+		<ResourceCompile Include="icon.rc" />
+	</ItemGroup>
+</Project>

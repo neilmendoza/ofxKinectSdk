@@ -34,12 +34,9 @@
 #include <Windows.h>
 #include <NuiApi.h>
 #include "ofMain.h"
-#include "ofxCv.h"
 
 namespace itg
 {
-	
-
 	class KinectSdk
 	{
 	public:
