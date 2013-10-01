@@ -1,7 +1,7 @@
 /*
  *  KinectSdk.h
  *
- *  Copyright (c) 2012, Neil Mendoza, http://www.neilmendoza.com
+ *  Copyright (c) 2013, Neil Mendoza, http://www.neilmendoza.com
  *  All rights reserved. 
  *  
  *  Redistribution and use in source and binary forms, with or without 
@@ -34,33 +34,23 @@
 #include <Windows.h>
 #include <NuiApi.h>
 #include "ofMain.h"
+#include "BaseKinectData.h"
 
 namespace itg
 {
-	class KinectSdk
+	class KinectSdk : public BaseKinectData
 	{
 	public:
-		enum Unit
-		{
-			M,
-			CM,
-			MM,
-
-			NUM_UNITS
-		};
-
 		static const unsigned DEPTH_BYTES_PER_PIXEL = 2;
 
-		static const float UNIT_SCALARS[NUM_UNITS];
 		static ofVec3f toOf(const Vector4& ms);
 
 		KinectSdk();
 
 		bool init(bool useSkeleton = true, bool useDepth = false);
 		void update();
-		void drawSkeletons(bool screenSpace = true);
-		void drawSkeleton(const NUI_SKELETON_DATA& skeletonData, int width, int height, bool screenSpace = true);
-		void drawBone(const NUI_SKELETON_DATA& skeletonData, NUI_SKELETON_POSITION_INDEX joint0, NUI_SKELETON_POSITION_INDEX joint1, bool screenSpace = true);
+		void drawSkeletons(bool screenSpace = false);
+		void drawSkeleton(const NUI_SKELETON_DATA& skeletonData, int width, int height, bool screenSpace = false);
 		unsigned getNumSkeletons(NUI_SKELETON_TRACKING_STATE trackingState = NUI_SKELETON_TRACKED);
 		vector<unsigned> getSkeletonIndices(NUI_SKELETON_TRACKING_STATE trackingState = NUI_SKELETON_TRACKED);
 		NUI_SKELETON_POSITION_TRACKING_STATE getSkeletonPosition(ofVec3f& position, unsigned skeletonIdx, NUI_SKELETON_POSITION_INDEX joint);
@@ -68,10 +58,6 @@ namespace itg
 		NUI_SKELETON_FRAME& getSkeletonFrameRef() { return skeletonFrame; }
 
 		bool isFrameNew();
-		//void depthToMat(cv::Mat& mat);
-
-		Unit getUnit() const { return unit; }
-		void setUnit(Unit unit);
 
 		void setDepthClipping(float nearClip=500, float farClip=4000);
 
@@ -91,17 +77,10 @@ namespace itg
 		void recordStart(const string& fileName);
 		void recordStop();
 
-		void playStart(const string& fileName);
-		void playStop();
-
 	private:
-		void parsePlayback(const string& line);
-		
-		ofVec3f recordedPositions[NUI_SKELETON_POSITION_COUNT];
-		bool recordedTracked[NUI_SKELETON_POSITION_COUNT];
+		void drawBone(const NUI_SKELETON_DATA& skeletonData, NUI_SKELETON_POSITION_INDEX joint0, NUI_SKELETON_POSITION_INDEX joint1, bool screenSpace = true);
 
 		ofstream skeletonRecordStream;
-		ifstream skeletonPlayStream;
 
 		void updateDepthPixels();
 		vector<unsigned char> depthLookupTable;
@@ -110,9 +89,6 @@ namespace itg
 		bool nearWhite;
 		ofTexture depthTex;
 
-		Unit unit;
-		float unitScalar;
-
 		INuiSensor* sensor;
 		HANDLE nextSkeletonEvent; // HANDLE is void*
 		HANDLE nextDepthFrameEvent; // HANDLE is void*
@@ -120,7 +96,7 @@ namespace itg
 
 		NUI_SKELETON_FRAME skeletonFrame;
 		
-		//cv::Mat depthMat;
+		// TODO: move to separate drawer class
 		ofVec2f screenPoints[NUI_SKELETON_POSITION_COUNT];
 		ofVec2f skeletonToScreen(Vector4 skeletonPoint, int width, int height);
 		bool frameNew;

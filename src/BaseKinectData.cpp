@@ -1,5 +1,5 @@
 /*
- *  ofxKinectSdk.h
+ *  BaseKinectData.cpp
  *
  *  Copyright (c) 2012, Neil Mendoza, http://www.neilmendoza.com
  *  All rights reserved. 
@@ -29,12 +29,15 @@
  *  POSSIBILITY OF SUCH DAMAGE. 
  *
  */
-#pragma once
+#include "BaseKinectData.h"
 
-#include "KinectSdk.h"
-#include "KinectPlayer.h"
+namespace itg
+{
+	const float BaseKinectData::UNIT_SCALARS[NUM_UNITS] = {1.f, 100.f, 1000.f};
 
-using namespace itg;
-
-typedef itg::KinectSdk ofxKinectSdk;
-typedef itg::KinectPlayer ofxKinectPlayer;
+	void BaseKinectData::setUnit(Unit unit)
+	{
+		unitScalar = UNIT_SCALARS[unit];
+		this->unit = unit;
+	}
+}

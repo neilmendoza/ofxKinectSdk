@@ -1,7 +1,7 @@
 /*
- *  ofxKinectSdk.h
+ *  BaseKinectData.h
  *
- *  Copyright (c) 2012, Neil Mendoza, http://www.neilmendoza.com
+ *  Copyright (c) 2013, Neil Mendoza, http://www.neilmendoza.com
  *  All rights reserved. 
  *  
  *  Redistribution and use in source and binary forms, with or without 
@@ -31,10 +31,33 @@
  */
 #pragma once
 
-#include "KinectSdk.h"
-#include "KinectPlayer.h"
+#include "ofMain.h"
 
-using namespace itg;
+namespace itg
+{
+	class BaseKinectData
+	{
+	public:
+		enum Unit
+		{
+			M,
+			CM,
+			MM,
 
-typedef itg::KinectSdk ofxKinectSdk;
-typedef itg::KinectPlayer ofxKinectPlayer;
+			NUM_UNITS
+		};
+
+		static const float UNIT_SCALARS[NUM_UNITS];
+
+		Unit getUnit() const { return unit; }
+		void setUnit(Unit unit);
+
+		float getUnitScalar() const { return unitScalar; }
+	
+	private:
+		Unit unit;
+		float unitScalar;
+	};
+}
+
+

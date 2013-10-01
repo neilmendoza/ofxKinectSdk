@@ -33,8 +33,6 @@
 
 namespace itg
 {
-	const float KinectSdk::UNIT_SCALARS[NUM_UNITS] = {1.f, 100.f, 1000.f};
-
 	ofVec3f KinectSdk::toOf(const Vector4& ms)
 	{
 		return ofVec3f(ms.x, ms.y, ms.z);
@@ -127,12 +125,6 @@ namespace itg
 		return hr;
 	}
 
-	void KinectSdk::setUnit(Unit unit)
-	{
-		unitScalar = UNIT_SCALARS[unit];
-		this->unit = unit;
-	}
-
 	bool KinectSdk::isFrameNew()
 	{
 		bool temp = frameNew;
@@ -144,17 +136,7 @@ namespace itg
 	{
 		if (!sensor) return;
 
-		if (skeletonPlayStream.is_open())
-		{
-			string line;
-			if (!getline(skeletonPlayStream, line))
-			{
-				skeletonPlayStream.clear();
-				skeletonPlayStream.seekg(ifstream::beg);
-				if (!getline(skeletonPlayStream, line)) ofLogError() << "Error trying to loop skeleton playback, is file empty?";
-			}
-			if (!line.empty()) parsePlayback(line);
-		}
+		
 		// Wait for 0ms, just quickly test if it is time to process a skeleton
 		else if (useSkeleton && WAIT_OBJECT_0 == WaitForSingleObject(nextSkeletonEvent, 0) )
 		{
@@ -220,7 +202,7 @@ namespace itg
 
 	void KinectSdk::recordStart(const string& fileName)
 	{
-		if (skeletonPlayStream.is_open()) skeletonPlayStream.close();
+		if (skeletonRecordStream.is_open()) skeletonRecordStream.close();
 		string path = ofToDataPath(fileName);
 		ofLogNotice() << "Recording skeleton data to " << path;
 		skeletonRecordStream.open(path);
@@ -231,44 +213,9 @@ namespace itg
 		skeletonRecordStream.close();
 	}
 
-	void KinectSdk::parsePlayback(const string& line)
-	{
-		vector<string> split = ofSplitString(line, ":");
-		for (unsigned i = 0; i < split.size(); ++i)
-		{
-			if (split[i].empty()) recordedTracked[i] = false;
-			else
-			{
-				recordedTracked[i] = true;
-				vector<string> xyz = ofSplitString(split[i], ",");
-				recordedPositions[i].set(atof(xyz[0].c_str()), atof(xyz[1].c_str()), atof(xyz[2].c_str()));
-			}
-		}
-	}
-
-	void KinectSdk::playStart(const string& fileName)
-	{
-		for (unsigned i = 0; i < NUI_SKELETON_POSITION_COUNT; ++i) recordedTracked[i] = false;
-		if (skeletonRecordStream.is_open()) skeletonRecordStream.close();
-		string path = ofToDataPath(fileName);
-		ofLogNotice() << "Playing skeleton data from " << path;
-		skeletonPlayStream.open(path);
-	}
-
-	void KinectSdk::playStop()
-	{
-
-	}
-
-	/*
-	void KinectSdk::depthToMat(cv::Mat& mat)
-	{
-
-	}*/
-
 	ofVec3f KinectSdk::getWorldCoordinateAt(int cx, int cy)
 	{
-		return unitScalar * toOf(NuiTransformDepthImageToSkeleton(
+		return getUnitScalar() * toOf(NuiTransformDepthImageToSkeleton(
 				cx,
 				cy,
 				depthPixelsRaw[cy * depthW + cx] << 3,
@@ -282,7 +229,7 @@ namespace itg
 		NUI_SKELETON_POSITION_TRACKING_STATE jointState = skeletonFrame.SkeletonData[skeletonIdx].eSkeletonPositionTrackingState[joint];
 
 		if (jointState != NUI_SKELETON_POSITION_NOT_TRACKED)
-			position = unitScalar * toOf(skeletonFrame.SkeletonData[skeletonIdx].SkeletonPositions[joint]);
+			position = getUnitScalar() * toOf(skeletonFrame.SkeletonData[skeletonIdx].SkeletonPositions[joint]);
 
 		return jointState;
 	}
