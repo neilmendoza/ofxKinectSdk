@@ -128,7 +128,7 @@ namespace itg
 		{
 			ofPushStyle();
 			ofSetColor(0, 255, 0);
-			ofLine(recordedPositions[joint0], recordedPositions[joint1]);
+			ofLine(getUnitScalar() * recordedPositions[joint0], getUnitScalar() * recordedPositions[joint1]);
 			ofPopStyle();
 		}
 	}
