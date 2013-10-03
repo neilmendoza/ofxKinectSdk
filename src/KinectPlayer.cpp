@@ -42,7 +42,7 @@ namespace itg
 		if (skeletonPlayStream.is_open()) skeletonPlayStream.close();
 		string path = ofToDataPath(fileName);
 		ofLogNotice() << "Playing skeleton data from " << path;
-		skeletonPlayStream.open(path);
+		skeletonPlayStream.open(path.c_str());
 	}
 
 	void KinectPlayer::loadDepthMovie(const string& fileName)

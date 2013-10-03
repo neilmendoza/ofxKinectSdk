@@ -31,6 +31,8 @@
  */
 #include "KinectSdk.h"
 
+#if defined(_WIN32) || defined(WIN32)
+
 namespace itg
 {
 	ofVec3f KinectSdk::toOf(const Vector4& ms)
@@ -387,3 +389,5 @@ namespace itg
 		}
 	}
 }
+
+#endif

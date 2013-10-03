@@ -31,6 +31,8 @@
  */
 #pragma once
 
+#if defined(_WIN32) || defined(WIN32)
+
 #include <Windows.h>
 #include <NuiApi.h>
 #include "ofMain.h"
@@ -111,3 +113,5 @@ namespace itg
 		unsigned depthW, depthH;
 	};
 }
+
+#endif

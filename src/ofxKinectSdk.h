@@ -36,5 +36,7 @@
 
 using namespace itg;
 
+#if defined(_WIN32) || defined(WIN32)
 typedef itg::KinectSdk ofxKinectSdk;
+#endif
 typedef itg::KinectPlayer ofxKinectPlayer;
