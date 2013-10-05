@@ -85,7 +85,10 @@ namespace itg
 		void stop();
 
 		void drawSkeletons();
-
+        
+        ofVec3f getPosition(NUI_SKELETON_POSITION_INDEX joint);
+        ofVec3f getPosition(unsigned joint);
+        
 	private:
 		void drawBone(unsigned joint0, unsigned joint1);
 

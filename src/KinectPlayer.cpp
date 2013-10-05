@@ -121,14 +121,24 @@ namespace itg
 		drawBone(NUI_SKELETON_POSITION_KNEE_RIGHT, NUI_SKELETON_POSITION_ANKLE_RIGHT);
 		drawBone(NUI_SKELETON_POSITION_ANKLE_RIGHT, NUI_SKELETON_POSITION_FOOT_RIGHT);
 	}
-
+    
+    ofVec3f KinectPlayer::getPosition(unsigned joint)
+    {
+        return getPosition((NUI_SKELETON_POSITION_INDEX)joint);
+    }
+    
+    ofVec3f KinectPlayer::getPosition(NUI_SKELETON_POSITION_INDEX joint)
+    {
+        return getUnitScalar() * recordedPositions[joint];
+    }
+    
 	void KinectPlayer::drawBone(unsigned joint0, unsigned joint1)
 	{
 		if (recordedTracked[joint0] && recordedTracked[joint1])
 		{
 			ofPushStyle();
 			ofSetColor(0, 255, 0);
-			ofLine(getUnitScalar() * recordedPositions[joint0], getUnitScalar() * recordedPositions[joint1]);
+			ofLine(getPosition(joint0), getPosition(joint1));
 			ofPopStyle();
 		}
 	}
