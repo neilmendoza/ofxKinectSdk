@@ -90,13 +90,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\BaseKinectData.cpp" />
+    <ClCompile Include="..\..\..\addons\ofxKinectSdk\src\BaseKinectData.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\testApp.cpp" />
     <ClCompile Include="..\..\..\addons\ofxKinectSdk\src\KinectSdk.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\BaseKinectData.h" />
+    <ClInclude Include="..\..\..\addons\ofxKinectSdk\src\BaseKinectData.h" />
     <ClInclude Include="src\testApp.h" />
     <ClInclude Include="..\..\..\addons\ofxKinectSdk\src\KinectSdk.h" />
     <ClInclude Include="..\..\..\addons\ofxKinectSdk\src\ofxKinectSdk.h" />

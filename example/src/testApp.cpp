@@ -16,5 +16,5 @@ void testApp::update()
 //--------------------------------------------------------------
 void testApp::draw()
 {
-	kinect.drawSkeletons();
+	kinect.drawSkeletons(true);
 }

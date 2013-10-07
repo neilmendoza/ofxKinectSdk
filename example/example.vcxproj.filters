@@ -10,7 +10,7 @@
     <ClCompile Include="..\..\..\addons\ofxKinectSdk\src\KinectSdk.cpp">
       <Filter>addons\ofxKinectSdk\src</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\BaseKinectData.cpp">
+    <ClCompile Include="..\..\..\addons\ofxKinectSdk\src\BaseKinectData.cpp">
       <Filter>addons\ofxKinectSdk\src</Filter>
     </ClCompile>
   </ItemGroup>
@@ -59,7 +59,7 @@
     <ClInclude Include="..\..\..\addons\ofxKinectSdk\libs\kinect\include\NuiSkeleton.h">
       <Filter>addons\ofxKinectSdk\libs\kinect\include</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\BaseKinectData.h">
+    <ClInclude Include="..\..\..\addons\ofxKinectSdk\src\BaseKinectData.h">
       <Filter>addons\ofxKinectSdk\src</Filter>
     </ClInclude>
   </ItemGroup>
