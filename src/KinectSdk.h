@@ -82,8 +82,6 @@ namespace itg
 	private:
 		void drawBone(const NUI_SKELETON_DATA& skeletonData, NUI_SKELETON_POSITION_INDEX joint0, NUI_SKELETON_POSITION_INDEX joint1, bool screenSpace = true);
 
-		ofstream skeletonRecordStream;
-
 		void updateDepthPixels();
 		vector<unsigned char> depthLookupTable;
 		void updateDepthLookupTable();
@@ -111,6 +109,10 @@ namespace itg
 
 		NUI_IMAGE_RESOLUTION depthResolution;
 		unsigned depthW, depthH;
+
+		// recording
+		ofstream skeletonRecordStream;
+		unsigned frameNum;
 	};
 }
 

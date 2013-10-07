@@ -48,6 +48,9 @@ namespace itg
 
 	bool KinectSdk::init(bool useSkeleton, bool useDepth)
 	{
+		this->useSkeleton = useSkeleton;
+		this->useDepth = useDepth;
+
 		INuiSensor* pNuiSensor;
 
 		int iSensorCount = 0;
@@ -198,8 +201,17 @@ namespace itg
 
 			depthTex.loadData(depthPixels.getPixels(), depthW, depthH, GL_LUMINANCE);
 
+			if (skeletonRecordStream.is_open())
+			{
+				ostringstream oss;
+				oss << frameNum << ".bmp";
+				ofSaveImage(depthPixels, oss.str());
+			}
+
 			frameNew = true;
 		}
+		// for recording
+		frameNum++;
 	}
 
 	void KinectSdk::recordStart(const string& fileName)
@@ -208,6 +220,7 @@ namespace itg
 		string path = ofToDataPath(fileName);
 		ofLogNotice() << "Recording skeleton data to " << path;
 		skeletonRecordStream.open(path);
+		frameNum = 0;
 	}
 
 	void KinectSdk::recordStop()
